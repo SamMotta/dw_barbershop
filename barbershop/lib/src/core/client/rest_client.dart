@@ -1,3 +1,4 @@
+import 'package:barbershop/src/core/client/interceptor/auth_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 
@@ -10,6 +11,7 @@ final class RestClient extends DioForNative {
         )) {
     interceptors.addAll([
       LogInterceptor(requestBody: true, responseBody: true),
+      AuthInterceptor(),
     ]);
   }
 

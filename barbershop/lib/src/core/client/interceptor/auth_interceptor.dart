@@ -1,0 +1,22 @@
+import 'package:barbershop/src/core/constants/local_storage._keys.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class AuthInterceptor extends Interceptor {
+  @override
+  void onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
+    final RequestOptions(:extra, :headers) = options;
+
+    const authHeaderKey = 'Authorization';
+    headers.remove(authHeaderKey);
+
+    if (extra case {'DIO_AUTH_KEY': true}) {
+      final sp = await SharedPreferences.getInstance();
+      headers.addAll({
+        authHeaderKey: 'Bearer ${sp.get(LocalStorageKeys.accessToken)}',
+      });
+    }
+    super.onRequest(options, handler);
+  }
+}

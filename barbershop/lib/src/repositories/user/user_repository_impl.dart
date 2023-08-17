@@ -3,8 +3,10 @@ import 'dart:io';
 
 import 'package:barbershop/src/core/client/rest_client.dart';
 import 'package:barbershop/src/core/exceptions/auth_exception.dart';
+import 'package:barbershop/src/core/exceptions/repository_exception.dart';
 
 import 'package:barbershop/src/core/fp/either.dart';
+import 'package:barbershop/src/models/user_model.dart';
 import 'package:dio/dio.dart';
 
 import './user_repository.dart';
@@ -38,6 +40,21 @@ class UserRepositoryImpl implements UserRepository {
       return Failure(
         AutheticationException(message: 'Erro ao realizar login.'),
       );
+    }
+  }
+
+  @override
+  Future<Either<RepositoryException, UserModel>> me() async {
+    try {
+      final Response(:data) = await restClient.auth.get('/me');
+
+      return Success(UserModel.fromMap(data));
+    } on DioException catch (err, stackTrace) {
+      log('Erro ao buscar usuário logado.', error: err, stackTrace: stackTrace);
+      return Failure(RepositoryException('Erro ao buscar usuário logado.'));
+    } on ArgumentError catch (err, stackTrace) {
+      log(err.message, error: err, stackTrace: stackTrace);
+      return Failure(RepositoryException(err.message));
     }
   }
 }
