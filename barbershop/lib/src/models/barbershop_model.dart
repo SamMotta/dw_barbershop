@@ -17,10 +17,12 @@ class BarbershopModel {
 
   factory BarbershopModel.fromMap(Map<String, Object?> json) => switch (json) {
         {
-          'id': int id,
-          'name': String name,
-          'email': String email,
+          'id': final int id,
+          'name': final String name,
+          'email': final String email,
+          // ignore: strict_raw_type
           'opening_days': final List openingDays,
+          // ignore: strict_raw_type
           'opening_hours': final List openingHours,
         } =>
           BarbershopModel(

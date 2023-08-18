@@ -7,9 +7,8 @@ import 'package:barbershop/src/repositories/barbershop/barbershop_repository.dar
 import 'package:dio/dio.dart';
 
 class BarbershopRepositoryImpl implements BarbershopRepository {
-  final RestClient restClient;
-
   BarbershopRepositoryImpl(this.restClient);
+  final RestClient restClient;
 
   @override
   Future<Either<RepositoryException, BarbershopModel>> getMyBarbershop(
@@ -17,12 +16,16 @@ class BarbershopRepositoryImpl implements BarbershopRepository {
   ) async {
     switch (userModel) {
       case UserModelAdmin():
-        final Response(
-          data: List(first: data),
-        ) = await restClient.auth.get('/barbershop', queryParameters: {
-          /// Coringa do JRS
-          'user_id': '#userAuthRef',
-        });
+        // HACK: unnecessary_null_checks
+        // ignore: unnecessary_null_checks
+        final Response<List<Map<String, Object>>>(data: List(first: data)!) =
+            await restClient.auth.get(
+          '/barbershop',
+          queryParameters: {
+            /// Coringa do JRS
+            'user_id': '#userAuthRef',
+          },
+        );
 
         return Success(BarbershopModel.fromMap(data));
       case UserModelEmployee():
@@ -30,7 +33,7 @@ class BarbershopRepositoryImpl implements BarbershopRepository {
           '/barbershop/${userModel.barbershopId}',
         );
 
-        return Success(BarbershopModel.fromMap(data));
+        return Success(BarbershopModel.fromMap(data as Map<String, Object?>));
     }
   }
 }

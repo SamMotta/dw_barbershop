@@ -6,26 +6,32 @@ import 'package:barbershop/src/core/exceptions/auth_exception.dart';
 import 'package:barbershop/src/core/exceptions/repository_exception.dart';
 
 import 'package:barbershop/src/core/fp/either.dart';
+import 'package:barbershop/src/core/fp/nil.dart';
 import 'package:barbershop/src/models/user_model.dart';
+import 'package:barbershop/src/repositories/user/user_repository.dart';
 import 'package:dio/dio.dart';
 
-import './user_repository.dart';
-
 class UserRepositoryImpl implements UserRepository {
-  final RestClient restClient;
-
   UserRepositoryImpl(this.restClient);
+
+  final RestClient restClient;
 
   @override
   Future<Either<BaseAuthException, String>> login(
-      String email, String password) async {
+    String email,
+    String password,
+  ) async {
     try {
-      final Response(:data) = await restClient.unauth.post('/auth', data: {
-        'email': email,
-        'password': password,
-      });
+      final Response(:data) =
+          await restClient.unauth.post<Map<String, Object?>>(
+        '/auth',
+        data: {
+          'email': email,
+          'password': password,
+        },
+      );
 
-      return Success(data['access_token']);
+      return Success(data!['access_token']! as String);
     } on DioException catch (e, s) {
       if (e.response != null) {
         final statusCode = e.response!.statusCode;
@@ -48,13 +54,41 @@ class UserRepositoryImpl implements UserRepository {
     try {
       final Response(:data) = await restClient.auth.get('/me');
 
-      return Success(UserModel.fromMap(data));
+      return Success(UserModel.fromMap(data as Map<String, Object?>));
     } on DioException catch (err, stackTrace) {
       log('Erro ao buscar usuário logado.', error: err, stackTrace: stackTrace);
       return Failure(RepositoryException('Erro ao buscar usuário logado.'));
     } on ArgumentError catch (err, stackTrace) {
-      log(err.message, error: err, stackTrace: stackTrace);
-      return Failure(RepositoryException(err.message));
+      log(err.message.toString(), error: err, stackTrace: stackTrace);
+      return Failure(RepositoryException(err.message.toString()));
+    }
+  }
+
+  @override
+  Future<Either<RepositoryException, Nil>> registerAdmin(
+    ({String email, String name, String password}) userData,
+  ) async {
+    try {
+      await restClient.unauth.post<void>(
+        '/users',
+        data: {
+          'name': userData.name,
+          'email': userData.email,
+          'password': userData.password,
+          'profile': 'ADM',
+        },
+      );
+
+      return Success(nil);
+    } on DioException catch (error, stackTrace) {
+      log(
+        error.message ?? 'Ocorreu um erro ao registrar um administrador.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return Failure(
+        RepositoryException('Ocorreu um erro ao registrar um administrador.'),
+      );
     }
   }
 }

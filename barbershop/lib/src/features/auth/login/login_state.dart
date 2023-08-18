@@ -7,12 +7,12 @@ class LoginState {
   final LoginStatus status;
   final String? errorMessage;
 
-  LoginState.initial() : this(status: LoginStatus.initial);
-
   LoginState({
     required this.status,
     this.errorMessage,
   });
+
+  LoginState.initial() : this(status: LoginStatus.initial);
 
   LoginState copyWith({
     LoginStatus? status,

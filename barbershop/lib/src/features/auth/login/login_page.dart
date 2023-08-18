@@ -1,12 +1,11 @@
+import 'package:barbershop/src/core/constants/constants.dart';
 import 'package:barbershop/src/core/ui/helpers/form_helper.dart';
 import 'package:barbershop/src/core/ui/helpers/messages.dart';
+import 'package:barbershop/src/features/auth/login/login_state.dart';
 import 'package:barbershop/src/features/auth/login/login_vm.dart';
 import 'package:flutter/material.dart';
-import 'package:barbershop/src/core/constants/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:validatorless/validatorless.dart';
-
-import 'login_state.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -88,7 +87,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             decoration: const InputDecoration(
                               label: Text('E-mail'),
                               hintText: 'E-mail',
-                              floatingLabelBehavior: FloatingLabelBehavior.never,
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.never,
                               labelStyle: TextStyle(color: Colors.black),
                               hintStyle: TextStyle(color: Colors.black),
                             ),
@@ -100,13 +100,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             validator: Validatorless.multiple([
                               Validatorless.required('Senha obrigatório'),
                               Validatorless.min(
-                                  6, 'A Senha deve conter ao menos 6 caracteres'),
+                                6,
+                                'A Senha deve conter ao menos 6 caracteres',
+                              ),
                             ]),
                             obscureText: true,
                             decoration: const InputDecoration(
                               label: Text('Senha'),
                               hintText: 'Senha',
-                              floatingLabelBehavior: FloatingLabelBehavior.never,
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.never,
                               labelStyle: TextStyle(color: Colors.black),
                               hintStyle: TextStyle(color: Colors.black),
                             ),
@@ -126,13 +129,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ),
                             onPressed: () async {
                               switch (formKey.currentState?.validate()) {
-                                case (false || null):
+                                case false || null:
                                   Messages.showError(
                                     'Campos e-mail ou senha inválidos!',
                                     context,
                                   );
                                 case true:
-                                  await loginVM.login(emailEC.text, passwordEC.text);
+                                  await loginVM.login(
+                                    emailEC.text,
+                                    passwordEC.text,
+                                  );
                               }
                             },
                             child: const Text(
@@ -143,20 +149,29 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ],
                       ),
                     ),
-                    const Align(
+                    Align(
                       alignment: Alignment.bottomCenter,
                       child: Padding(
-                        padding: EdgeInsets.all(18),
-                        child: Text(
-                          'Criar conta',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 18,
+                        padding: const EdgeInsets.all(10),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.of(context)
+                                .pushNamed('/auth/register/user');
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Criar conta',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

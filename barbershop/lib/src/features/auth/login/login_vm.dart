@@ -1,10 +1,10 @@
+import 'package:asyncstate/asyncstate.dart';
 import 'package:barbershop/src/core/exceptions/service_exception.dart';
 import 'package:barbershop/src/core/fp/either.dart';
 import 'package:barbershop/src/core/providers/application_providers.dart';
 import 'package:barbershop/src/features/auth/login/login_state.dart';
 import 'package:barbershop/src/models/user_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:asyncstate/asyncstate.dart';
 
 part 'login_vm.g.dart';
 

@@ -1,7 +1,7 @@
 sealed class BaseAuthException implements Exception {
-  final String message;
-
   BaseAuthException({required this.message});
+
+  final String message;
 }
 
 class AutheticationException extends BaseAuthException {

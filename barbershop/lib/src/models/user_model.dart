@@ -37,15 +37,15 @@ class UserModelAdmin extends UserModel {
   factory UserModelAdmin.fromMap(Map<String, Object?> json) {
     return switch (json) {
       {
-        'id': int id,
-        'name': String name,
-        'email': String email,
+        'id': final int id,
+        'name': final String name,
+        'email': final String email,
       } =>
         UserModelAdmin(
           id: id,
           name: name,
           email: email,
-          avatar: json['avatar'] != null ? json['avatar'] as String : null,
+          avatar: json['avatar'] as String?,
           workDays: (json['work_days'] as List?)?.cast<String>(),
           workHours: (json['work_hours'] as List?)?.cast<int>(),
         ),
@@ -72,12 +72,14 @@ class UserModelEmployee extends UserModel {
   factory UserModelEmployee.fromMap(Map<String, Object?> json) =>
       switch (json) {
         {
-          'id': int id,
-          'name': String name,
-          'email': String email,
-          'barbershop_id': int barbershopId,
-          'work_days': List workDays,
-          'work_hours': List workHours,
+          'id': final int id,
+          'name': final String name,
+          'email': final String email,
+          'barbershop_id': final int barbershopId,
+          // ignore: strict_raw_type
+          'work_days': final List workDays,
+          // ignore: strict_raw_type
+          'work_hours': final List workHours,
         } =>
           UserModelEmployee(
             id: id,
@@ -86,7 +88,7 @@ class UserModelEmployee extends UserModel {
             barbershopId: barbershopId,
             workDays: workDays.cast<String>(),
             workHours: workHours.cast<int>(),
-            avatar: json['avatar'] != null ? json['avatar'] as String : null,
+            avatar: json['avatar'] as String?,
           ),
         _ => throw ArgumentError('Invalid JSON!'),
       };
