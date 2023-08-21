@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:barbershop/src/core/client/rest_client.dart';
 import 'package:barbershop/src/core/exceptions/repository_exception.dart';
 import 'package:barbershop/src/core/fp/either.dart';
+import 'package:barbershop/src/core/fp/nil.dart';
 import 'package:barbershop/src/models/barbershop_model.dart';
 import 'package:barbershop/src/models/user_model.dart';
 import 'package:barbershop/src/repositories/barbershop/barbershop_repository.dart';
@@ -34,6 +37,39 @@ class BarbershopRepositoryImpl implements BarbershopRepository {
         );
 
         return Success(BarbershopModel.fromMap(data as Map<String, Object?>));
+    }
+  }
+
+  @override
+  Future<Either<RepositoryException, Nil>> save(
+    ({
+      String email,
+      String name,
+      List<String> openingDays,
+      List<int> openingHours
+    }) data,
+  ) async {
+    try {
+      await restClient.auth.post<void>(
+        '/barbershop/',
+        data: {
+          'user_id': '#userAuthRef',
+          'name': data.name,
+          'email': data.email,
+          'opening_days': data.openingDays,
+          'opening_hours': data.openingHours,
+        },
+      );
+
+      return Success(nil);
+    } on DioException catch (error, stackTrace) {
+      log(
+        'Ocorreu um erro ao registrar a barbearia.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+
+      return Failure(RepositoryException('message'));
     }
   }
 }
