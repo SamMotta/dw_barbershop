@@ -6,7 +6,7 @@ part of 'splash_vm.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$splashVMHash() => r'7757c38e5f61df3d213f62d063b7ab43a6b32b8b';
+String _$splashVMHash() => r'c33eac7243e10439d6fda171543d54b138954920';
 
 /// See also [SplashVM].
 @ProviderFor(SplashVM)

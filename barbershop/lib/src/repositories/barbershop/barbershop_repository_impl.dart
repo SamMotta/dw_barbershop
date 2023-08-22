@@ -19,8 +19,7 @@ class BarbershopRepositoryImpl implements BarbershopRepository {
   ) async {
     switch (userModel) {
       case UserModelAdmin():
-        final Response<List<Map<String, Object>>>(:data) =
-            await restClient.auth.get(
+        final Response(:data) = await restClient.auth.get<List<dynamic>>(
           '/barbershop',
           queryParameters: {
             /// Coringa do JRS
@@ -28,7 +27,11 @@ class BarbershopRepositoryImpl implements BarbershopRepository {
           },
         );
 
-        return Success(BarbershopModel.fromMap(data!.first));
+        return Success(
+          BarbershopModel.fromMap(
+            data!.first as Map<String, Object?>,
+          ),
+        );
       case UserModelEmployee():
         final Response(:data) = await restClient.auth.get(
           '/barbershop/${userModel.barbershopId}',

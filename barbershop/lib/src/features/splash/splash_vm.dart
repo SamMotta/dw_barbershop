@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:barbershop/src/core/constants/local_storage._keys.dart';
 import 'package:barbershop/src/core/providers/application_providers.dart';
 import 'package:barbershop/src/models/user_model.dart';
@@ -23,19 +21,17 @@ class SplashVM extends _$SplashVM {
     final sp = await SharedPreferences.getInstance();
 
     if (sp.containsKey(LocalStorageKeys.accessToken)) {
-      ref
-        ..invalidate(getMeProvider)
-        ..invalidate(getMyBarbershopProvider);
+      ref.invalidate(getMeProvider);
+      // ignore: cascade_invocations
+      ref.invalidate(getMyBarbershopProvider);
 
       try {
         final userModel = await ref.watch(getMeProvider.future);
 
-        switch (userModel) {
-          case UserModelAdmin():
-            return SplashState.loggedAdmin;
-          case UserModelEmployee():
-            return SplashState.loggedEmployee;
-        }
+        return switch (userModel) {
+          UserModelAdmin() => SplashState.loggedAdmin,
+          UserModelEmployee() => SplashState.loggedEmployee,
+        };
       } catch (e) {
         return SplashState.login;
       }

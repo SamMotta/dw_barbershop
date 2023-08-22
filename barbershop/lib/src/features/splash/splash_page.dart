@@ -1,8 +1,8 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:barbershop/src/core/constants/constants.dart';
 import 'package:barbershop/src/core/ui/helpers/messages.dart';
-import 'package:barbershop/src/features/auth/login/login_page.dart';
 import 'package:barbershop/src/features/splash/splash_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +21,9 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   double get logoAnimationWidth => 100 * _scale;
   double get logoAnimationHeight => 120 * _scale;
 
+  bool endAnimation = false;
+  Timer? redirectTimer;
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -33,6 +36,22 @@ class _SplashPageState extends ConsumerState<SplashPage> {
     super.initState();
   }
 
+  void _redirect(String routeName) {
+    if (!endAnimation) {
+      redirectTimer?.cancel();
+      redirectTimer = Timer(
+        const Duration(milliseconds: 300),
+        () => _redirect(routeName),
+      );
+    } else {
+      redirectTimer?.cancel();
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        routeName,
+        (route) => false,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.listen(splashVMProvider, (_, status) {
@@ -40,20 +59,11 @@ class _SplashPageState extends ConsumerState<SplashPage> {
         data: (data) {
           switch (data) {
             case SplashState.loggedAdmin:
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                '/home/admin',
-                (route) => false,
-              );
+              _redirect('/home/admin');
             case SplashState.loggedEmployee:
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                '/auth/employee',
-                (route) => false,
-              );
+              _redirect('/home/employee');
             case _:
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                '/auth/login',
-                (route) => false,
-              );
+              _redirect('/auth/login');
           }
         },
         error: (error, stackTrace) {
@@ -81,17 +91,12 @@ class _SplashPageState extends ConsumerState<SplashPage> {
         ),
         child: Center(
           child: AnimatedOpacity(
-            onEnd: () => Navigator.of(context).pushAndRemoveUntil(
-              PageRouteBuilder<void>(
-                settings: const RouteSettings(name: '/auth/login'),
-                transitionsBuilder: (_, animation, __, child) => FadeTransition(
-                  opacity: animation,
-                  child: child,
-                ),
-                pageBuilder: (___, __, _) => const LoginPage(),
-              ),
-              (route) => false,
-            ),
+            // HACK: erro ao realizar login automático
+            onEnd: () {
+              setState(() {
+                endAnimation = true;
+              });
+            },
             duration: const Duration(seconds: 1),
             curve: Curves.easeIn,
             opacity: _animationOpacityLogo,
