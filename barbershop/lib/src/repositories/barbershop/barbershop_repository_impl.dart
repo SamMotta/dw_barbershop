@@ -19,9 +19,7 @@ class BarbershopRepositoryImpl implements BarbershopRepository {
   ) async {
     switch (userModel) {
       case UserModelAdmin():
-        // HACK: unnecessary_null_checks
-        // ignore: unnecessary_null_checks
-        final Response<List<Map<String, Object>>>(data: List(first: data)!) =
+        final Response<List<Map<String, Object>>>(:data) =
             await restClient.auth.get(
           '/barbershop',
           queryParameters: {
@@ -30,7 +28,7 @@ class BarbershopRepositoryImpl implements BarbershopRepository {
           },
         );
 
-        return Success(BarbershopModel.fromMap(data));
+        return Success(BarbershopModel.fromMap(data!.first));
       case UserModelEmployee():
         final Response(:data) = await restClient.auth.get(
           '/barbershop/${userModel.barbershopId}',
@@ -69,7 +67,9 @@ class BarbershopRepositoryImpl implements BarbershopRepository {
         stackTrace: stackTrace,
       );
 
-      return Failure(RepositoryException('message'));
+      return Failure(
+        RepositoryException('Ocorreu um erro ao registrar a barbearia.'),
+      );
     }
   }
 }

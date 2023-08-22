@@ -22,6 +22,7 @@ class LoginVM extends _$LoginVM {
     switch (result) {
       case Success():
         //* Invalidando os caches, para evitar login com o usuário errado!
+        //* Ao invalidar, ele apaga o cache e executa a função novamente.
         ref.invalidate(getMeProvider);
         ref.invalidate(getMyBarbershopProvider);
 

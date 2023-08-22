@@ -6,9 +6,11 @@ class HoursPanel extends StatelessWidget {
   const HoursPanel({
     required this.startTime,
     required this.endTime,
+    required this.onHourPressed,
     super.key,
   });
 
+  final ValueChanged<int> onHourPressed;
   final int startTime;
   final int endTime;
 
@@ -28,6 +30,8 @@ class HoursPanel extends StatelessWidget {
             for (var i = startTime; i <= endTime; i++)
               TimeButton(
                 '${i.toString().padLeft(2, '0')}:00',
+                onHourPressed,
+                i,
               ),
           ],
         ),
@@ -36,30 +40,50 @@ class HoursPanel extends StatelessWidget {
   }
 }
 
-class TimeButton extends StatelessWidget {
+class TimeButton extends StatefulWidget {
   const TimeButton(
-    this.label, {
+    this.label,
+    this.onHourPressed,
+    this.value, {
     super.key,
   });
 
+  final ValueChanged<int> onHourPressed;
+  final int value;
   final String label;
+
+  @override
+  State<TimeButton> createState() => _TimeButtonState();
+}
+
+class _TimeButtonState extends State<TimeButton> {
+  bool isSelected = false;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(8),
-      onTap: () {},
+      onTap: () => setState(() {
+        isSelected = !isSelected;
+        widget.onHourPressed(widget.value);
+      }),
       child: Container(
         height: 36,
         width: 64,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: ColorsConstants.grey),
+          color: isSelected ? ColorsConstants.brown : null,
+          border: Border.all(
+            color: isSelected ? ColorsConstants.brown : ColorsConstants.grey,
+          ),
         ),
         child: Center(
           child: Text(
-            label,
-            style: const TextStyle(color: ColorsConstants.grey, fontSize: 12),
+            widget.label,
+            style: TextStyle(
+              color: isSelected ? Colors.white : ColorsConstants.grey,
+              fontSize: 12,
+            ),
           ),
         ),
       ),

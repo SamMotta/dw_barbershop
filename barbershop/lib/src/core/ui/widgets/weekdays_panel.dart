@@ -2,29 +2,31 @@ import 'package:barbershop/src/core/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class WeekdaysPanel extends StatelessWidget {
-  const WeekdaysPanel({super.key});
+  const WeekdaysPanel({required this.onDayPressed, super.key});
+
+  final ValueChanged<String> onDayPressed;
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
-        Text(
+        const Text(
           'Selecione os dias de atendimento',
           style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              DayButton('Seg'),
-              DayButton('Ter'),
-              DayButton('Qua'),
-              DayButton('Qui'),
-              DayButton('Sex'),
-              DayButton('Sab'),
-              DayButton('Dom'),
+              DayButton('Seg', onDayPressed),
+              DayButton('Ter', onDayPressed),
+              DayButton('Qua', onDayPressed),
+              DayButton('Qui', onDayPressed),
+              DayButton('Sex', onDayPressed),
+              DayButton('Sab', onDayPressed),
+              DayButton('Dom', onDayPressed),
             ],
           ),
         ),
@@ -35,10 +37,12 @@ class WeekdaysPanel extends StatelessWidget {
 
 class DayButton extends StatefulWidget {
   const DayButton(
-    this.label, {
+    this.label,
+    this.onDayPressed, {
     super.key,
   });
 
+  final ValueChanged<String> onDayPressed;
   final String label;
 
   @override
@@ -46,31 +50,32 @@ class DayButton extends StatefulWidget {
 }
 
 class _DayButtonState extends State<DayButton> {
-  bool selected = false;
+  bool isSelected = false;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(3),
       child: InkWell(
-        onTap: () => setState(
-          () => selected = !selected,
-        ),
+        onTap: () {
+          widget.onDayPressed(widget.label);
+          setState(() => isSelected = !isSelected);
+        },
         child: Container(
           width: 40,
           height: 56,
           decoration: BoxDecoration(
-            color: selected ? ColorsConstants.brown : null,
+            color: isSelected ? ColorsConstants.brown : null,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: selected ? ColorsConstants.brown : ColorsConstants.grey,
+              color: isSelected ? ColorsConstants.brown : ColorsConstants.grey,
             ),
           ),
           child: Center(
             child: Text(
               widget.label,
               style: TextStyle(
-                color: selected ? Colors.white : ColorsConstants.grey,
+                color: isSelected ? Colors.white : ColorsConstants.grey,
                 fontSize: 12,
               ),
             ),

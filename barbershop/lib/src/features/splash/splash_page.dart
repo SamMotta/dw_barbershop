@@ -1,15 +1,20 @@
-import 'package:barbershop/src/core/constants/constants.dart';
-import 'package:barbershop/src/features/auth/login/login_page.dart';
-import 'package:flutter/material.dart';
+import 'dart:developer';
 
-class SplashPage extends StatefulWidget {
+import 'package:barbershop/src/core/constants/constants.dart';
+import 'package:barbershop/src/core/ui/helpers/messages.dart';
+import 'package:barbershop/src/features/auth/login/login_page.dart';
+import 'package:barbershop/src/features/splash/splash_vm.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 
   @override
-  State<SplashPage> createState() => _SplashPageState();
+  ConsumerState<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> {
+class _SplashPageState extends ConsumerState<SplashPage> {
   var _scale = 10.0;
   var _animationOpacityLogo = 0.0;
 
@@ -30,6 +35,40 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(splashVMProvider, (_, status) {
+      status.whenOrNull(
+        data: (data) {
+          switch (data) {
+            case SplashState.loggedAdmin:
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                '/home/admin',
+                (route) => false,
+              );
+            case SplashState.loggedEmployee:
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                '/auth/employee',
+                (route) => false,
+              );
+            case _:
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                '/auth/login',
+                (route) => false,
+              );
+          }
+        },
+        error: (error, stackTrace) {
+          log(
+            'Ocorreu um erro ao validar login.',
+            error: error,
+            stackTrace: stackTrace,
+          );
+          Messages.showError('Ocorreu um erro ao validar login.', context);
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil('/auth/login', (route) => false);
+        },
+      );
+    });
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: DecoratedBox(
