@@ -91,4 +91,43 @@ class UserRepositoryImpl implements UserRepository {
       );
     }
   }
+
+  @override
+  Future<Either<RepositoryException, List<UserModel>>> getEmployees(
+    int barbershopId,
+  ) async {
+    try {
+      final Response(:List<dynamic> data) = await restClient.auth.get(
+        '/users',
+        queryParameters: {
+          'barbershop_id': barbershopId,
+        },
+      );
+
+      final employees = data
+          .map(
+            (e) => UserModel.fromMap(e as Map<String, Object?>),
+          )
+          .toList();
+
+      return Success(employees);
+    } on DioException catch (e, s) {
+      log('Ocorreu um erro ao buscar colaboradores.', error: e, stackTrace: s);
+      return Failure(
+        RepositoryException('Ocorreu um erro ao buscar colaboradores.'),
+      );
+    } on ArgumentError catch (e, s) {
+      log(
+        'Ocorreu um erro ao tratar os dados dos colaboradores. (Invalid JSON)',
+        error: e,
+        stackTrace: s,
+      );
+      return Failure(
+        RepositoryException(
+          'Ocorreu um erro ao tratar os dados '
+          'dos colaboradores. (Invalid JSON)',
+        ),
+      );
+    }
+  }
 }

@@ -2,8 +2,14 @@ import 'package:barbershop/src/core/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class WeekdaysPanel extends StatelessWidget {
-  const WeekdaysPanel({required this.onDayPressed, super.key});
 
+  const WeekdaysPanel({
+    required this.onDayPressed,
+    this.enabledDays,
+    super.key,
+  });
+
+  final List<String>? enabledDays;
   final ValueChanged<String> onDayPressed;
 
   @override

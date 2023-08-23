@@ -2,6 +2,7 @@ import 'package:barbershop/src/core/constants/constants.dart';
 import 'package:barbershop/src/core/providers/application_providers.dart';
 import 'package:barbershop/src/core/ui/icons/barbershop_icons.dart';
 import 'package:barbershop/src/core/ui/widgets/barbershop_loader.dart';
+import 'package:barbershop/src/features/home/admin/home_admin_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -64,7 +65,8 @@ class HomeHeader extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () =>
+                      ref.read(homeAdminVMProvider.notifier).logout(),
                   icon: const Icon(
                     BarbershopIcons.exit,
                     color: ColorsConstants.brown,

@@ -91,7 +91,6 @@ class _SplashPageState extends ConsumerState<SplashPage> {
         ),
         child: Center(
           child: AnimatedOpacity(
-            // HACK: erro ao realizar login automático
             onEnd: () {
               setState(() {
                 endAnimation = true;
