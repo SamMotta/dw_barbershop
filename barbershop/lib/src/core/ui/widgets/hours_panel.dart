@@ -7,9 +7,11 @@ class HoursPanel extends StatelessWidget {
     required this.startTime,
     required this.endTime,
     required this.onHourPressed,
+    this.enabledHours,
     super.key,
   });
 
+  final List<int>? enabledHours;
   final ValueChanged<int> onHourPressed;
   final int startTime;
   final int endTime;
@@ -32,6 +34,7 @@ class HoursPanel extends StatelessWidget {
                 '${i.toString().padLeft(2, '0')}:00',
                 onHourPressed,
                 i,
+                enabledHours,
               ),
           ],
         ),
@@ -44,10 +47,12 @@ class TimeButton extends StatefulWidget {
   const TimeButton(
     this.label,
     this.onHourPressed,
-    this.value, {
+    this.value,
+    this.enabledHours, {
     super.key,
   });
 
+  final List<int>? enabledHours;
   final ValueChanged<int> onHourPressed;
   final int value;
   final String label;
@@ -61,27 +66,43 @@ class _TimeButtonState extends State<TimeButton> {
 
   @override
   Widget build(BuildContext context) {
+    final TimeButton(:enabledHours, :label, :onHourPressed, :value) = widget;
+
+    final borderColor =
+        isSelected ? ColorsConstants.brown : ColorsConstants.grey;
+    var bgColor = isSelected ? ColorsConstants.brown : null;
+    final textColor = isSelected ? Colors.white : ColorsConstants.grey;
+
+    final isDisabledHour =
+        enabledHours != null && !enabledHours.contains(value);
+
+    if (isDisabledHour) {
+      bgColor = Colors.grey.shade400;
+    }
+
     return InkWell(
       borderRadius: BorderRadius.circular(8),
-      onTap: () => setState(() {
-        isSelected = !isSelected;
-        widget.onHourPressed(widget.value);
-      }),
+      onTap: isDisabledHour
+          ? null
+          : () => setState(() {
+                isSelected = !isSelected;
+                onHourPressed(value);
+              }),
       child: Container(
         height: 36,
         width: 64,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          color: isSelected ? ColorsConstants.brown : null,
+          color: bgColor,
           border: Border.all(
-            color: isSelected ? ColorsConstants.brown : ColorsConstants.grey,
+            color: borderColor,
           ),
         ),
         child: Center(
           child: Text(
-            widget.label,
+            label,
             style: TextStyle(
-              color: isSelected ? Colors.white : ColorsConstants.grey,
+              color: textColor,
               fontSize: 12,
             ),
           ),

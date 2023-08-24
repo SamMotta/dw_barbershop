@@ -130,4 +130,85 @@ class UserRepositoryImpl implements UserRepository {
       );
     }
   }
+
+  @override
+  Future<Either<RepositoryException, Nil>> registerAdminAsEmployee(
+    ({List<String> workDays, List<int> workHours}) data,
+  ) async {
+    try {
+      final userModelResult = await me();
+
+      final int userId;
+
+      switch (userModelResult) {
+        case Success(value: UserModel(:final id)):
+          userId = id;
+        case Failure(:final exception):
+          return Failure(exception);
+      }
+
+      await restClient.auth.put<void>(
+        '/users/$userId',
+        data: {
+          'work_days': data.workDays,
+          'work_hours': data.workHours,
+        },
+      );
+
+      return Success(nil);
+    } on DioException catch (e, s) {
+      log(
+        'Ocorreu um erro ao adicionar administrador como colaborador.',
+        error: e,
+        stackTrace: s,
+      );
+
+      return Failure(
+        RepositoryException(
+          'Ocorreu um erro ao adicionar administrador como colaborador.',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<RepositoryException, Nil>> registerEmployee(
+    ({
+      int barbershopId,
+      String email,
+      String name,
+      String password,
+      List<String> workDays,
+      List<int> workHours
+    }) data,
+  ) async {
+    try {
+      await restClient.auth.post<void>(
+        '/users',
+        data: {
+          'barbershop_id': data.barbershopId,
+          'email': data.email,
+          'name': data.name,
+          'password': data.password,
+          'profile': 'EMPLOYEE',
+          'work_days': data.workDays,
+          'work_hours': data.workHours,
+        },
+      );
+
+      return Success(nil);
+    } on DioException catch (e, s) {
+      log(
+        'Ocorreu um erro ao criar colaborador.',
+        error: e,
+        stackTrace: s,
+      );
+
+      return Failure(
+        RepositoryException(
+          'Ocorreu um erro ao criar colaborador.',
+        ),
+      );
+    }
+  }
 }
