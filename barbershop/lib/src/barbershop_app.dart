@@ -7,6 +7,7 @@ import 'package:barbershop/src/features/auth/register/barbershop/barbershop_regi
 import 'package:barbershop/src/features/auth/register/user/user_register_page.dart';
 import 'package:barbershop/src/features/employee/register/employee_register_page.dart';
 import 'package:barbershop/src/features/home/admin/home_admin_page.dart';
+import 'package:barbershop/src/features/schedule/schedule_page.dart';
 import 'package:barbershop/src/features/splash/splash_page.dart';
 import 'package:flutter/material.dart';
 
@@ -31,6 +32,7 @@ class BarbershopApp extends StatelessWidget {
           '/home/admin': (_) => const HomeAdminPage(),
           '/home/employee': (_) => const Text('EMPLOYEE'),
           '/employee/register': (_) => const EmployeeRegisterPage(),
+          '/schedule': (_) => const SchedulePage(),
         },
       ),
     );
