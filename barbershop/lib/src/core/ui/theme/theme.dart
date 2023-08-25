@@ -34,6 +34,7 @@ sealed class BarbershopTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
+        // minimumSize: const Size.fromHeight(56),
         foregroundColor: Colors.white,
         backgroundColor: ColorsConstants.brown,
         shape: RoundedRectangleBorder(

@@ -1,9 +1,17 @@
 import 'package:barbershop/src/core/constants/constants.dart';
+import 'package:barbershop/src/core/ui/helpers/messages.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class ScheduleCalendar extends StatefulWidget {
-  const ScheduleCalendar({super.key});
+  const ScheduleCalendar({
+    required this.cancelPressed,
+    required this.okPressed,
+    super.key,
+  });
+
+  final VoidCallback cancelPressed;
+  final ValueChanged<DateTime> okPressed;
 
   @override
   State<ScheduleCalendar> createState() => _ScheduleCalendarState();
@@ -15,8 +23,14 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
+    final ScheduleCalendar(:cancelPressed, :okPressed) = widget;
 
     return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFe6e2e9),
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
         children: [
           TableCalendar<void>(
@@ -25,8 +39,8 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
             rangeSelectionMode: RangeSelectionMode.disabled,
             locale: 'pt_BR',
             focusedDay: now,
-            firstDay: DateTime.utc(now.year, now.month),
-            lastDay: now.add(const Duration(days: 14)),
+            firstDay: DateTime.utc(now.year),
+            lastDay: now.add(const Duration(days: 7)),
             availableCalendarFormats: const {
               CalendarFormat.month: 'Month',
             },
@@ -36,16 +50,50 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
             onDaySelected: (selectedDay, _) => setState(() {
               this.selectedDay = selectedDay;
             }),
-            calendarStyle: const CalendarStyle(
-              todayDecoration: BoxDecoration(
-                color: ColorsConstants.grey,
-                shape: BoxShape.circle,
-              ),
-              selectedDecoration: BoxDecoration(
+            calendarStyle: CalendarStyle(
+              todayDecoration: const BoxDecoration(
                 color: ColorsConstants.brown,
                 shape: BoxShape.circle,
               ),
+              selectedDecoration: BoxDecoration(
+                color: ColorsConstants.brown.withOpacity(0.4),
+                shape: BoxShape.circle,
+              ),
             ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: cancelPressed,
+                child: const Text(
+                  'Cancelar',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: ColorsConstants.brown,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  final selectedDay = this.selectedDay;
+                  if (selectedDay is DateTime) {
+                    return okPressed(selectedDay);
+                  }
+
+                  return Messages.showError('Selecione um dia.', context);
+                },
+                child: const Text(
+                  'Ok',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: ColorsConstants.brown,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
