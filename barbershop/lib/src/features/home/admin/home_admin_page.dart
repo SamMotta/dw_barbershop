@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:barbershop/src/core/constants/constants.dart';
+import 'package:barbershop/src/core/providers/application_providers.dart';
 import 'package:barbershop/src/core/ui/icons/barbershop_icons.dart';
 import 'package:barbershop/src/core/ui/widgets/barbershop_loader.dart';
 import 'package:barbershop/src/features/home/admin/home_admin_vm.dart';
@@ -22,7 +23,9 @@ class HomeAdminPage extends ConsumerWidget {
         backgroundColor: ColorsConstants.brown,
         onPressed: () async {
           await Navigator.of(context).pushNamed('/employee/register');
-          ref.invalidate(homeAdminVMProvider);
+          ref
+            ..invalidate(getMeProvider)
+            ..invalidate(homeAdminVMProvider);
         },
         child: const CircleAvatar(
           backgroundColor: Colors.white,
