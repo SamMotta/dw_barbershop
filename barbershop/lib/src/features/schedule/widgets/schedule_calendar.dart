@@ -7,11 +7,13 @@ class ScheduleCalendar extends StatefulWidget {
   const ScheduleCalendar({
     required this.cancelPressed,
     required this.okPressed,
+    required this.workDays,
     super.key,
   });
 
   final VoidCallback cancelPressed;
   final ValueChanged<DateTime> okPressed;
+  final List<String> workDays;
 
   @override
   State<ScheduleCalendar> createState() => _ScheduleCalendarState();
@@ -19,6 +21,26 @@ class ScheduleCalendar extends StatefulWidget {
 
 class _ScheduleCalendarState extends State<ScheduleCalendar> {
   DateTime? selectedDay;
+  late final List<int> weekDaysEnabled;
+
+  int convertWeekday(String weekDay) {
+    return switch (weekDay.toLowerCase()) {
+      'seg' => DateTime.monday,
+      'ter' => DateTime.tuesday,
+      'qua' => DateTime.wednesday,
+      'qui' => DateTime.thursday,
+      'sex' => DateTime.friday,
+      'sab' => DateTime.saturday,
+      'dom' => DateTime.sunday,
+      _ => 0,
+    };
+  }
+
+  @override
+  void initState() {
+    weekDaysEnabled = widget.workDays.map(convertWeekday).toList();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +63,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
             focusedDay: now,
             firstDay: DateTime.utc(now.year),
             lastDay: now.add(const Duration(days: 7)),
+            enabledDayPredicate: (day) => weekDaysEnabled.contains(day.weekday),
             availableCalendarFormats: const {
               CalendarFormat.month: 'Month',
             },

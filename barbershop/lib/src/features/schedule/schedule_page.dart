@@ -4,37 +4,74 @@ import 'package:barbershop/src/core/ui/helpers/messages.dart';
 import 'package:barbershop/src/core/ui/icons/barbershop_icons.dart';
 import 'package:barbershop/src/core/ui/widgets/avatar_widget.dart';
 import 'package:barbershop/src/core/ui/widgets/hours_panel.dart';
+import 'package:barbershop/src/features/schedule/schedule_state.dart';
+import 'package:barbershop/src/features/schedule/schedule_vm.dart';
 import 'package:barbershop/src/features/schedule/widgets/schedule_calendar.dart';
+import 'package:barbershop/src/models/user_model.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:validatorless/validatorless.dart';
 
-class SchedulePage extends StatefulWidget {
+class SchedulePage extends ConsumerStatefulWidget {
   const SchedulePage({super.key});
 
   @override
-  State<SchedulePage> createState() => _SchedulePageState();
+  ConsumerState<SchedulePage> createState() => _SchedulePageState();
 }
 
-class _SchedulePageState extends State<SchedulePage> {
+class _SchedulePageState extends ConsumerState<SchedulePage> {
   final formKey = GlobalKey<FormState>();
-  final dateFormatter = DateFormat('dd/mm/yyyy');
+  final dateFormatter = DateFormat('dd/MM/yyyy');
 
-  final nameEC = TextEditingController();
+  final clientEC = TextEditingController();
   final dateEC = TextEditingController();
 
   bool showCalendar = false;
 
   @override
   void dispose() {
-    nameEC.dispose();
+    clientEC.dispose();
     dateEC.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final scheduleVM = ref.watch(scheduleVMProvider.notifier);
+
+    final user = ModalRoute.of(context)!.settings.arguments! as UserModel;
+
+    final employee = switch (user) {
+      UserModelAdmin(:final workDays, :final workHours) => (
+          workDays: workDays!,
+          workHours: workHours!,
+        ),
+      UserModelEmployee(:final workDays, :final workHours) => (
+          workDays: workDays,
+          workHours: workHours,
+        ),
+    };
+
+    ref.listen(
+      scheduleVMProvider.select((state) => state.status),
+      (_, status) {
+        switch (status) {
+          case ScheduleStatus.initial:
+            break;
+          case ScheduleStatus.success:
+            Messages.showSuccess('Cliente agendado com sucesso', context);
+            Navigator.of(context).pop();
+          case ScheduleStatus.error:
+            Messages.showError(
+              'Ocorreu um erro ao registrar agendamento',
+              context,
+            );
+        }
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -51,16 +88,16 @@ class _SchedulePageState extends State<SchedulePage> {
               children: [
                 const AvatarWidget(hideUploadButton: true),
                 const SizedBox(height: 24),
-                const Text(
-                  'Nome e sobrenome',
-                  style: TextStyle(
+                Text(
+                  user.name,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 37),
                 TextFormField(
-                  controller: nameEC,
+                  controller: clientEC,
                   validator:
                       Validatorless.required('O campo cliente é obrigatório.'),
                   onTapOutside: (_) => context.unfocus(),
@@ -72,7 +109,8 @@ class _SchedulePageState extends State<SchedulePage> {
                 TextFormField(
                   readOnly: true,
                   controller: dateEC,
-                  validator: Validatorless.date('Insira uma data válida.'),
+                  validator:
+                      Validatorless.required('O campo data é obrigatório.'),
                   onTap: () => setState(() {
                     showCalendar = true;
                   }),
@@ -93,11 +131,12 @@ class _SchedulePageState extends State<SchedulePage> {
                     children: [
                       const SizedBox(height: 32),
                       ScheduleCalendar(
+                        workDays: employee.workDays,
                         okPressed: (selectedDay) {
-                          setState(() {
-                            dateEC.text = dateFormatter.format(selectedDay);
-                            showCalendar = false;
-                          });
+                          dateEC.text = dateFormatter.format(selectedDay);
+                          scheduleVM.dateSelect(selectedDay);
+                          showCalendar = false;
+                          setState(() {});
                         },
                         cancelPressed: () {
                           setState(() {
@@ -109,11 +148,11 @@ class _SchedulePageState extends State<SchedulePage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                const HoursPanel.singleSelection(
+                HoursPanel.singleSelection(
                   startTime: 6,
                   endTime: 23,
-                  onHourPressed: print,
-                  enabledHours: [6, 7, 8, 9, 10],
+                  onHourPressed: scheduleVM.hourSelect,
+                  enabledHours: employee.workHours,
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
@@ -128,6 +167,22 @@ class _SchedulePageState extends State<SchedulePage> {
                           context,
                         );
                       case true:
+                        final hourSelected = ref.watch(
+                          scheduleVMProvider
+                              .select((state) => state.scheduleHour != null),
+                        );
+
+                        if (hourSelected) {
+                          scheduleVM.register(
+                            user: user,
+                            clientName: clientEC.text,
+                          );
+                        } else {
+                          Messages.showError(
+                            'Selecione um horário de atendimento',
+                            context,
+                          );
+                        }
                     }
                   },
                   child: const Text(

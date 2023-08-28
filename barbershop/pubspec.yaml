@@ -24,6 +24,7 @@ dependencies:
   freezed_annotation: ^2.4.1
   table_calendar: ^3.0.9
   intl: ^0.18.1
+  syncfusion_flutter_calendar: ^22.2.10
 
 dev_dependencies:
   flutter_test:
