@@ -46,7 +46,7 @@ sealed class BarbershopTheme {
       style: OutlinedButton.styleFrom(
         foregroundColor: ColorsConstants.brown,
         shape: RoundedRectangleBorder(
-          side: const BorderSide(color: ColorsConstants.brown),
+          side: const BorderSide(color: ColorsConstants.brown, width: 2),
           borderRadius: BorderRadius.circular(8),
         ),
       ),
